@@ -45,22 +45,22 @@ public class TransactionService {
         );
         
         // 영속화
-        Transaction savedTransaction = transactionRepository.save(transaction);
+        transactionRepository.save(transaction);
         
         // 도메인 이벤트 발행 - 다른 컨텍스트들이 구독할 수 있음
         TransactionCreatedEvent event = new TransactionCreatedEvent(
-            savedTransaction.getId(),
-            savedTransaction.getUserId(),
-            savedTransaction.getAmount(),
-            savedTransaction.getType(),
-            savedTransaction.getCategory(),
-            savedTransaction.getTransactionDate(),
-            savedTransaction.getDescription()
+            transaction.getId(),
+            transaction.getUserId(),
+            transaction.getAmount(),
+            transaction.getType(),
+            transaction.getCategory(),
+            transaction.getTransactionDate(),
+            transaction.getDescription()
         );
         
         eventPublisher.publishEvent(event);
         
-        return savedTransaction.getId();
+        return transaction.getId();
     }
     
     /**
@@ -68,7 +68,7 @@ public class TransactionService {
      */
     @Transactional(readOnly = true)
     public List<Transaction> getTransactionsByUser(Long userId) {
-        return transactionRepository.findByUserIdOrderByTransactionDateDesc(userId);
+        return transactionRepository.transactionsOf(new com.finance.demo.shared.domain.UserId(userId));
     }
     
     /**
@@ -76,7 +76,7 @@ public class TransactionService {
      */
     @Transactional(readOnly = true)
     public List<Transaction> getTransactionsByUserAndCategory(Long userId, Category category) {
-        return transactionRepository.findByUserIdAndCategoryOrderByTransactionDateDesc(userId, category);
+        return transactionRepository.transactionsInCategory(new com.finance.demo.shared.domain.UserId(userId), category);
     }
     
     /**

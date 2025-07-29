@@ -22,7 +22,7 @@ public class ConcurrencyException extends RuntimeException {
         this.expectedVersion = expectedVersion;
         this.actualVersion = actualVersion;
     }
-    
+
     public String getAggregateId() {
         return aggregateId;
     }

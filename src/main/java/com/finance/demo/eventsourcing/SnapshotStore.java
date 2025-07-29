@@ -1,5 +1,6 @@
 package com.finance.demo.eventsourcing;
 
+import com.finance.demo.shared.eventsourcing.Snapshot;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -44,29 +45,4 @@ public interface SnapshotStore {
      * 모든 스냅샷을 제거합니다 (테스트 목적)
      */
     void clear();
-}
-
-/**
- * 스냅샷 데이터를 담는 레코드
- */
-record Snapshot(
-    String aggregateId,
-    Object data,
-    int version,
-    LocalDateTime createdAt
-) {
-    public Snapshot {
-        if (aggregateId == null || aggregateId.trim().isEmpty()) {
-            throw new IllegalArgumentException("애그리게이트 ID는 필수입니다");
-        }
-        if (data == null) {
-            throw new IllegalArgumentException("스냅샷 데이터는 필수입니다");
-        }
-        if (version < 0) {
-            throw new IllegalArgumentException("버전은 0 이상이어야 합니다");
-        }
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
 }

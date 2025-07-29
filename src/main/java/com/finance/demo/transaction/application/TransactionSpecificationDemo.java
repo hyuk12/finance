@@ -45,12 +45,11 @@ public class TransactionSpecificationDemo {
         Specification<Transaction> highAmountSpec = 
             new HighAmountTransactionSpec(Money.of(new BigDecimal("100000")));
         
-        List<Transaction> highAmountTransactions = transactionRepository.findAllForUser(userId, highAmountSpec);
-        log.info("고액 거래 (10만원 이상): {}건", highAmountTransactions.size());
+        // 실제 구현체가 없으므로 로그만 출력
+        log.info("고액 거래 Specification 생성 완료");
 
         Specification<Transaction> foodSpec = new CategoryTransactionSpec(Category.FOOD);
-        List<Transaction> foodTransactions = transactionRepository.findAllForUser(userId, foodSpec);
-        log.info("식비 거래: {}건", foodTransactions.size());
+        log.info("식비 거래 Specification 생성 완료");
     }
 
     private void demonstrateComplexCombinations(UserId userId) {
@@ -61,8 +60,7 @@ public class TransactionSpecificationDemo {
                 .and(new CategoryTransactionSpec(Category.FOOD))
                 .and(new HighAmountTransactionSpec(Money.of(new BigDecimal("50000"))));
 
-        List<Transaction> recentHighAmountFood = transactionRepository.findAllForUser(userId, recentHighAmountFoodSpec);
-        log.info("최근 30일간 고액 식비 지출 (5만원 이상): {}건", recentHighAmountFood.size());
+        log.info("복합 Specification 조합 완료: 최근 30일간 고액 식비 지출");
     }
 
     private Money calculateTotal(List<Transaction> transactions) {

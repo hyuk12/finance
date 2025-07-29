@@ -1,5 +1,6 @@
 package com.finance.demo.eventsourcing;
 
+import com.finance.demo.shared.eventsourcing.Snapshot;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

@@ -1,5 +1,6 @@
 package com.finance.demo.eventsourcing;
 
+import com.finance.demo.shared.domain.DomainEvent;
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
  * - 애그리게이트 ID
  * - 애그리게이트 내 버전 번호
  * - 이벤트 타입
- * - 직렬화된 이벤트 데이터
+ * - 실제 도메인 이벤트 객체
  * - 저장 시각
  */
 public record StoredEvent(
@@ -18,7 +19,7 @@ public record StoredEvent(
     String aggregateId,
     int version,
     String eventType,
-    String eventData,
+    DomainEvent domainEvent,
     LocalDateTime timestamp
 ) {
     
@@ -29,8 +30,8 @@ public record StoredEvent(
         if (eventType == null || eventType.trim().isEmpty()) {
             throw new IllegalArgumentException("이벤트 타입은 필수입니다");
         }
-        if (eventData == null) {
-            throw new IllegalArgumentException("이벤트 데이터는 필수입니다");
+        if (domainEvent == null) {
+            throw new IllegalArgumentException("도메인 이벤트는 필수입니다");
         }
         if (version < 0) {
             throw new IllegalArgumentException("버전은 0 이상이어야 합니다");
