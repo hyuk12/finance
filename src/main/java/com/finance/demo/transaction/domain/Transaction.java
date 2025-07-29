@@ -1,21 +1,25 @@
 package com.finance.demo.transaction.domain;
 
+import com.finance.demo.shared.domain.AggregateRoot;
+import com.finance.demo.transaction.domain.event.TransactionCreatedEvent;
+import com.finance.demo.transaction.domain.event.TransactionRecategorizedEvent;
+import com.finance.demo.transaction.domain.event.HighAmountTransactionDetectedEvent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 거래 데이터 컨텍스트의 거래 애그리게이트 루트
+ * Day 2: 도메인 이벤트를 발행하는 거래 애그리게이트 루트
  * 
- * 유비쿼터스 언어 정의:
- * - Transaction: 사용자의 금융 계좌에서 발생하는 입금 또는 출금 기록
- * - 속성: 금액, 일시, 카테고리, 설명, 계좌정보
- * - 규칙: 모든 거래는 반드시 하나의 카테고리에 속해야 함
+ * AggregateRoot를 상속하여 도메인 이벤트 관리 기능 추가:
+ * - 거래 생성 시 TransactionCreatedEvent 발행
+ * - 고액 거래 감지 시 HighAmountTransactionDetectedEvent 발행  
+ * - 재분류 시 TransactionRecategorizedEvent 발행
  */
 @Entity
 @Table(name = "transactions")
-public class Transaction {
+public class Transaction extends AggregateRoot {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,6 +65,30 @@ public class Transaction {
         this.type = type;
         this.category = category;
         this.createdAt = LocalDateTime.now();
+        
+        // Day 2: 거래 생성 이벤트 발행
+        this.raise(new TransactionCreatedEvent(
+            this.id,
+            this.userId,
+            this.amount,
+            this.type,
+            this.category,
+            this.transactionDate,
+            this.description
+        ));
+        
+        // Day 2: 고액 거래 감지
+        if (isHighAmountTransaction(amount)) {
+            this.raise(new HighAmountTransactionDetectedEvent(
+                this.id,
+                this.userId,
+                this.amount,
+                this.category,
+                calculateRiskLevel(amount, category),
+                "금액 기준 고액 거래 감지",
+                BigDecimal.ZERO // 실제로는 사용자 평균 금액을 계산해야 함
+            ));
+        }
     }
     
     // 도메인 비즈니스 메서드
@@ -68,7 +96,21 @@ public class Transaction {
         if (newCategory == null) {
             throw new IllegalArgumentException("카테고리는 필수입니다");
         }
+        
+        Category previousCategory = this.category;
         this.category = newCategory;
+        
+        // Day 2: 재분류 이벤트 발행
+        if (!previousCategory.equals(newCategory)) {
+            this.raise(new TransactionRecategorizedEvent(
+                this.id,
+                this.userId,
+                previousCategory,
+                newCategory,
+                this.amount,
+                "사용자 수동 재분류"
+            ));
+        }
     }
     
     public boolean isExpense() {
@@ -77,6 +119,45 @@ public class Transaction {
     
     public boolean isIncome() {
         return this.type == TransactionType.INCOME;
+    }
+    
+    // Day 2: 고액 거래 판단 로직
+    private boolean isHighAmountTransaction(BigDecimal amount) {
+        // 50만원 이상을 고액으로 분류
+        return amount.compareTo(new BigDecimal("500000")) >= 0;
+    }
+    
+    // Day 2: 위험도 계산 로직
+    private HighAmountTransactionDetectedEvent.RiskLevel calculateRiskLevel(BigDecimal amount, Category category) {
+        // 금액별 위험도 분류
+        if (amount.compareTo(new BigDecimal("2000000")) >= 0) {
+            return HighAmountTransactionDetectedEvent.RiskLevel.CRITICAL;
+        } else if (amount.compareTo(new BigDecimal("1000000")) >= 0) {
+            return HighAmountTransactionDetectedEvent.RiskLevel.HIGH;
+        } else if (amount.compareTo(new BigDecimal("500000")) >= 0) {
+            return HighAmountTransactionDetectedEvent.RiskLevel.MEDIUM;
+        } else {
+            return HighAmountTransactionDetectedEvent.RiskLevel.LOW;
+        }
+    }
+    
+    // Day 2: 도메인 쿼리 메서드들
+    public boolean isWeekendTransaction() {
+        int dayOfWeek = transactionDate.getDayOfWeek().getValue();
+        return dayOfWeek == 6 || dayOfWeek == 7; // 토요일(6) 또는 일요일(7)
+    }
+    
+    public boolean isLateNightTransaction() {
+        int hour = transactionDate.getHour();
+        return hour >= 22 || hour <= 5; // 오후 10시 ~ 오전 5시
+    }
+    
+    public boolean isLargerThan(BigDecimal threshold) {
+        return this.amount.compareTo(threshold) > 0;
+    }
+    
+    public boolean isSameCategoryAs(Transaction other) {
+        return this.category.equals(other.category);
     }
     
     // Getters
