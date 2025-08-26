@@ -1,38 +1,39 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+about: 버그 신고
+title: '[BUG] '
+labels: bug
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## 🐛 버그 설명
+<!-- 발견한 버그에 대해 명확하고 간결하게 설명해주세요! -->
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## 🔄 재현 단계
+1.
+2. 
+3.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## 💯 예상 동작
+<!-- 어떤 결과를 예상했었는지 설명해주세요. -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## 🤦‍♀️ 실제 동작
+<!-- 실제로 어떤 일이 일어났는지 설명해주세요. -->
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## 📌 관련 도메인/계층
+- [ ] 도메인 계층
+- [ ] 어플리케이션 계층
+- [ ] 인프라스트럭쳐 계층
+- [ ] 인터페이스 계층
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+## 🖥️ 스크린샷/로그기록
+<!-- 가능하다면 스크린샷이나 로그를 첨부해주세요. -->
 
-**Additional context**
-Add any other context about the problem here.
+## 🌐 환경
+- OS:
+- Java Version:
+- Spring Boot Version:
+- api test tool:
+
+## 📄 추가 정보
+<!-- 버그와 관련된 추가 정보가 있다면 작성부탁드립니다. -->
